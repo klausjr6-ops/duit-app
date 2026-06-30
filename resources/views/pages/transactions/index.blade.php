@@ -15,7 +15,6 @@
   .card.amber-top{border-top:3px solid var(--amber);}
   .card.blue-top{border-top:3px solid var(--blue);}
 
-  /* Form Modal */
   .btn-primary{background:var(--teal);color:#000;border:none;border-radius:var(--radius-sm);padding:10px 20px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;}
   .btn-primary:hover{opacity:.9;}
   .btn-danger{background:rgba(255,91,91,.15);color:var(--red);border:1px solid rgba(255,91,91,.3);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;cursor:pointer;}
@@ -35,7 +34,6 @@
   .type-btn.income.active{border-color:var(--teal);background:rgba(0,212,170,.1);color:var(--teal);}
   .type-btn.expense.active{border-color:var(--red);background:rgba(255,91,91,.1);color:var(--red);}
 
-  /* Table */
   .table-wrap{overflow-x:auto;}
   table{width:100%;border-collapse:collapse;}
   thead th{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--text-muted);text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
@@ -51,18 +49,50 @@
   .pagination-wrap{margin-top:16px;display:flex;justify-content:center;gap:6px;}
 
   @media (max-width: 768px) {
-  .page-header{flex-direction:column;align-items:flex-start;gap:12px;}
-  .page-header .btn-primary{width:100%;justify-content:center;}
-  .grid-stats{grid-template-columns:1fr;}
-  .table-wrap{overflow-x:auto;}
-  table{min-width:600px;}
-  .modal-box{max-width:92vw;padding:20px;}
-}
+    .page-header{flex-direction:column;align-items:flex-start;gap:12px;}
+    .page-header .btn-primary{width:100%;justify-content:center;}
+    .grid-stats{grid-template-columns:1fr;}
+    .modal-box{max-width:92vw;padding:20px;}
 
-@media (max-width: 480px) {
-  .page-title{font-size:18px;}
-  .stat-value{font-size:22px;}
-}
+    .table-wrap table thead{display:none;}
+    .table-wrap table, .table-wrap table tbody, .table-wrap table tr, .table-wrap table td{
+      display:block;
+      width:100%;
+    }
+    .table-wrap table tr{
+      background:var(--bg-card-2,#1e2333);
+      border-radius:var(--radius-sm);
+      padding:14px;
+      margin-bottom:12px;
+      border:1px solid var(--border);
+    }
+    .table-wrap table td{
+      padding:6px 0;
+      border-bottom:none;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .table-wrap table td:before{
+      content:attr(data-label);
+      font-size:11px;
+      font-weight:700;
+      color:var(--text-muted);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+    .table-wrap table td:last-child{
+      justify-content:flex-end;
+    }
+    .table-wrap table td:last-child:before{
+      display:none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-title{font-size:18px;}
+    .stat-value{font-size:22px;}
+  }
 </style>
 @endpush
 
@@ -81,7 +111,6 @@
   <div class="alert-success">✅ {{ session('success') }}</div>
 @endif
 
-<!-- Stats -->
 <div class="grid-stats">
   <div class="card teal-top">
     <div class="card-label">Total Saldo</div>
@@ -97,7 +126,6 @@
   </div>
 </div>
 
-<!-- Table -->
 <div class="card">
   <div class="table-wrap">
     @if($transactions->isEmpty())
@@ -121,14 +149,14 @@
         <tbody>
           @foreach($transactions as $t)
           <tr>
-            <td style="color:var(--text-muted)">{{ \Carbon\Carbon::parse($t->date)->format('d M Y') }}</td>
-            <td>{{ $t->description ?? '-' }}</td>
-            <td style="color:var(--text-muted)">{{ $t->category ?? '-' }}</td>
-            <td><span class="badge {{ $t->type }}">{{ $t->type == 'income' ? '⬇️ Masuk' : '⬆️ Keluar' }}</span></td>
-            <td style="font-weight:700" class="{{ $t->type == 'income' ? 'teal' : 'red' }}">
+            <td data-label="Tanggal" style="color:var(--text-muted)">{{ \Carbon\Carbon::parse($t->date)->format('d M Y') }}</td>
+            <td data-label="Keterangan">{{ $t->description ?? '-' }}</td>
+            <td data-label="Kategori" style="color:var(--text-muted)">{{ $t->category ?? '-' }}</td>
+            <td data-label="Tipe"><span class="badge {{ $t->type }}">{{ $t->type == 'income' ? '⬇️ Masuk' : '⬆️ Keluar' }}</span></td>
+            <td data-label="Jumlah" style="font-weight:700" class="{{ $t->type == 'income' ? 'teal' : 'red' }}">
               {{ $t->type == 'income' ? '+' : '-' }} Rp {{ number_format($t->amount, 0, ',', '.') }}
             </td>
-            <td>
+            <td data-label="">
               <form method="POST" action="{{ route('transactions.destroy', $t) }}" onsubmit="return confirm('Hapus transaksi ini?')">
                 @csrf @method('DELETE')
                 <button class="btn-danger" type="submit">Hapus</button>
@@ -143,7 +171,6 @@
   </div>
 </div>
 
-<!-- Modal Tambah -->
 <div class="modal-overlay" id="modal-add" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal-box">
     <div class="modal-title">
