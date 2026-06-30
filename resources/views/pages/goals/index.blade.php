@@ -48,6 +48,22 @@
   .empty-state{text-align:center;padding:60px 20px;color:var(--text-dim);}
   .empty-state .icon{font-size:48px;margin-bottom:12px;}
   .alert-success{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--teal);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:13px;}
+
+@media (max-width: 768px) {
+  .page-header{flex-direction:column;align-items:flex-start;gap:12px;}
+  .page-header .btn-primary{width:100%;justify-content:center;}
+  .goals-grid{grid-template-columns:1fr;}
+  .summary-nums{flex-direction:column;gap:4px;}
+  .modal-box{max-width:92vw;padding:20px;}
+  .goal-actions{flex-wrap:wrap;}
+}
+
+@media (max-width: 480px) {
+  .page-title{font-size:18px;}
+  .summary-pct{font-size:20px;}
+  .goal-saved{font-size:16px;}
+}
+
 </style>
 @endpush
 

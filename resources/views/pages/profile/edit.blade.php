@@ -31,6 +31,20 @@
   .avatar-upload-btn:hover{border-color:var(--teal);}
   .danger-row{display:flex;justify-content:space-between;align-items:center;}
   .danger-text{font-size:13px;color:var(--text-muted);max-width:320px;}
+
+@media (max-width: 768px) {
+  .form-input{max-width:100%;}
+  .avatar-row{flex-direction:column;align-items:flex-start;gap:14px;}
+  .danger-row{flex-direction:column;align-items:flex-start;gap:14px;}
+  .danger-row .btn-danger-outline{width:100%;}
+  .card{padding:18px;}
+}
+
+@media (max-width: 480px) {
+  .page-title{font-size:18px;}
+  .avatar-preview{width:64px;height:64px;font-size:24px;}
+}
+
 </style>
 @endpush
 

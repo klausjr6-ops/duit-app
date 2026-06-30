@@ -49,6 +49,20 @@
   .empty-state .icon{font-size:48px;margin-bottom:12px;}
   .alert-success{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--teal);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:13px;}
   .pagination-wrap{margin-top:16px;display:flex;justify-content:center;gap:6px;}
+
+  @media (max-width: 768px) {
+  .page-header{flex-direction:column;align-items:flex-start;gap:12px;}
+  .page-header .btn-primary{width:100%;justify-content:center;}
+  .grid-stats{grid-template-columns:1fr;}
+  .table-wrap{overflow-x:auto;}
+  table{min-width:600px;}
+  .modal-box{max-width:92vw;padding:20px;}
+}
+
+@media (max-width: 480px) {
+  .page-title{font-size:18px;}
+  .stat-value{font-size:22px;}
+}
 </style>
 @endpush
 
