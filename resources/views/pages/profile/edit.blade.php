@@ -44,7 +44,9 @@
   .page-title{font-size:18px;}
   .avatar-preview{width:64px;height:64px;font-size:24px;}
 }
-
+git add .
+git commit -m "Add mobile responsive to all pages"
+git push
 </style>
 @endpush
 
