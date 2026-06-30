@@ -133,13 +133,6 @@
   .mood-btn{flex:0 0 calc(33.333% - 6px);}
 }
 
-/* ============================================
-   TAMBAHKAN CSS INI DI DALAM @push('styles')
-   pada file resources/views/pages/dashboard.blade.php
-   (letakkan di dalam media query 768px yang sudah ada,
-   atau tambahkan media query baru sebelum </style>)
-   ============================================ */
-
 @media (max-width: 768px) {
   .fab{
     bottom:76px;
@@ -155,6 +148,7 @@
     overflow-y:auto;
   }
 }
+
 </style>
 @endpush
 
