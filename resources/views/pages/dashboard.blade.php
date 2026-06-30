@@ -116,6 +116,21 @@
   .modal-input { flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; color:var(--text-main); font-size:13px; outline:none; font-family:inherit; }
   .modal-send { background:var(--teal); color:#000; border:none; border-radius:var(--radius-sm); padding:10px 18px; font-weight:700; font-size:13px; cursor:pointer; }
 </style>
+@media (max-width: 768px) {
+  .header{flex-direction:column;align-items:flex-start;gap:12px;}
+  .grid-top{grid-template-columns:1fr;}
+  .grid-stats{grid-template-columns:1fr;}
+  .grid-middle{grid-template-columns:1fr;}
+  .report-inner{grid-template-columns:1fr;}
+  .report-chart-wrap{margin:0 auto;}
+  .clock-time{font-size:36px;}
+  .stat-value{font-size:24px;}
+}
+
+@media (max-width: 480px) {
+  .clock-time{font-size:30px;}
+  .mood-buttons{flex-wrap:wrap;}
+  .mood-btn{flex:0 0 calc(33.333% - 6px);}
 @endpush
 
 @section('content')
