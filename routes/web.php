@@ -21,4 +21,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('transactions', App\Http\Controllers\TransactionController::class);
     Route::resource('schedules', App\Http\Controllers\ScheduleController::class);
     Route::resource('goals', App\Http\Controllers\GoalController::class);
+
+    use App\Http\Controllers\NotificationController;
+
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications/pending', [NotificationController::class, 'pending'])
+        ->name('notifications.pending');
+});
 });
