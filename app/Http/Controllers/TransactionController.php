@@ -10,30 +10,57 @@ class TransactionController extends Controller
 {
     public function index()
     {
-        $transactions = Transaction::where('user_id', auth()->id())
-            ->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $userId = auth()->id();
+        $today = Carbon::today();
+        $startOfMonth = Carbon::now()->startOfMonth();
 
-        $totalIncome = Transaction::where('user_id', auth()->id())->where('type', 'income')->sum('amount');
-        $totalExpense = Transaction::where('user_id', auth()->id())->where('type', 'expense')->sum('amount');
+        // Stats
+        $totalIncome  = Transaction::where('user_id', $userId)->where('type', 'income')->sum('amount');
+        $totalExpense = Transaction::where('user_id', $userId)->where('type', 'expense')->sum('amount');
         $totalBalance = $totalIncome - $totalExpense;
 
-        $monthlyIncome = Transaction::where('user_id', auth()->id())
-            ->where('type', 'income')
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
-            ->sum('amount');
+        $monthlyIncome  = Transaction::where('user_id', $userId)->where('type', 'income')->whereBetween('date', [$startOfMonth, $today])->sum('amount');
+        $monthlyExpense = Transaction::where('user_id', $userId)->where('type', 'expense')->whereBetween('date', [$startOfMonth, $today])->sum('amount');
 
-        $monthlyExpense = Transaction::where('user_id', auth()->id())
+        // Last 7 days chart data
+        $last7Days = collect(range(6, 0))->map(function ($i) use ($userId) {
+            $date = Carbon::today()->subDays($i);
+            return [
+                'label'   => $date->translatedFormat('D'),
+                'date'    => $date->format('Y-m-d'),
+                'income'  => Transaction::where('user_id', $userId)->where('type', 'income')->whereDate('date', $date)->sum('amount'),
+                'expense' => Transaction::where('user_id', $userId)->where('type', 'expense')->whereDate('date', $date)->sum('amount'),
+            ];
+        });
+
+        // Budget per kategori (expense only this month)
+        $budgetByCategory = Transaction::where('user_id', $userId)
             ->where('type', 'expense')
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
-            ->sum('amount');
+            ->whereBetween('date', [$startOfMonth, $today])
+            ->whereNotNull('category')
+            ->groupBy('category')
+            ->selectRaw('category, SUM(amount) as total')
+            ->orderByDesc('total')
+            ->get();
+
+        // Activity map (this month, per day)
+        $activityMap = Transaction::where('user_id', $userId)
+            ->whereBetween('date', [$startOfMonth, Carbon::now()->endOfMonth()])
+            ->selectRaw('date, SUM(CASE WHEN type="expense" THEN amount ELSE 0 END) as expense, SUM(CASE WHEN type="income" THEN amount ELSE 0 END) as income')
+            ->groupBy('date')
+            ->get()
+            ->keyBy('date');
+
+        // Recent transactions
+        $transactions = Transaction::where('user_id', $userId)
+            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('pages.transactions.index', compact(
-            'transactions', 'totalBalance', 'totalIncome', 'totalExpense',
-            'monthlyIncome', 'monthlyExpense'
+            'totalIncome', 'totalExpense', 'totalBalance',
+            'monthlyIncome', 'monthlyExpense',
+            'last7Days', 'budgetByCategory', 'activityMap', 'transactions'
         ));
     }
 
