@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>DUIT — @yield('title', 'Dashboard')</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
     :root {
       --bg-base:     #0f1117;
@@ -57,6 +58,25 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg-base); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    /* Notifikasi */
+    .notif-banner {
+    position: fixed; bottom: 16px; right: 16px;
+    background: var(--bg-card-2); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+    z-index: 200; max-width: 320px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      }
+    .notif-banner button {
+    background: var(--teal); color: #000; border: none;
+    padding: 6px 12px; border-radius: 6px; font-weight: 600;
+    font-size: 12px; cursor: pointer; white-space: nowrap;
+      }
+    .notif-banner .dismiss {
+    background: transparent; color: var(--text-muted);
+    padding: 4px; font-size: 16px;
+      }
   </style>
   @stack('styles')
 </head>
@@ -72,6 +92,69 @@
 <main class="main">
   @yield('content')
 </main>
+
+<!-- Banner minta izin notifikasi -->
+<div class="notif-banner" x-show="permission === 'default'" x-cloak>
+    <span style="font-size: 20px;">🔔</span>
+    <div style="flex: 1; font-size: 13px; color: var(--text-muted);">
+        Aktifkan notifikasi untuk pengingat jadwal &amp; budget
+    </div>
+    <button @click="requestPermission()">Aktifkan</button>
+    <button class="dismiss" @click="permission = 'dismissed'">✕</button>
+</div>
+
+<script>
+  function notificationSystem() {
+    return {
+        permission: 'default',
+        pollTimer: null,
+        pollIntervalMs: 60000, // cek tiap 1 menit, ubah sesuai kebutuhan
+
+        init() {
+            if (!('Notification' in window)) return;
+            this.permission = Notification.permission;
+
+            if (this.permission === 'granted') {
+                this.startPolling();
+            }
+        },
+
+        requestPermission() {
+            Notification.requestPermission().then(perm => {
+                this.permission = perm;
+                if (perm === 'granted') {
+                    new Notification('DUIT', {
+                        body: 'Notifikasi aktif! Kamu akan dapat pengingat jadwal & alert budget.',
+                    });
+                    this.startPolling();
+                }
+            });
+        },
+
+        startPolling() {
+            this.checkAlerts();
+            this.pollTimer = setInterval(() => this.checkAlerts(), this.pollIntervalMs);
+        },
+
+        checkAlerts() {
+            fetch('{{ route("notifications.pending") }}', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                (data.alerts || []).forEach(alert => {
+                    const shownKey = 'notif_shown_' + alert.id;
+                    if (localStorage.getItem(shownKey)) return;
+
+                    new Notification(alert.title, { body: alert.body });
+                    localStorage.setItem(shownKey, '1');
+                });
+            })
+            .catch(err => console.error('Gagal cek notifikasi:', err));
+        }
+    };
+}
+</script>
 
 @stack('scripts')
 </body>
