@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
+
+    
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -22,10 +26,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('schedules', App\Http\Controllers\ScheduleController::class);
     Route::resource('goals', App\Http\Controllers\GoalController::class);
 
-    use App\Http\Controllers\NotificationController;
-
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     Route::get('/notifications/pending', [NotificationController::class, 'pending'])
         ->name('notifications.pending');
+
 });
 });
