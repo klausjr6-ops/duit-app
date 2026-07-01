@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::table('schedules', function (Blueprint $table) {
             if (!Schema::hasColumn('schedules', 'notified')) {
-                $table->boolean('notified')->default(false)->after('scheduled_at');
+                $table->boolean('notified')->default(false);
             }
         });
     }
