@@ -280,16 +280,21 @@
       </form>
     </div>
     @endforeach
-    <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:13px;">
-  @if($transactions->previousPageUrl())
-    <a href="{{ $transactions->previousPageUrl() }}" style="color:var(--teal);text-decoration:none;font-weight:600;">← Sebelumnya</a>
+    @if($transactions->hasPages())
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:13px;">
+  @if($transactions->onFirstPage())
+    <span style="color:var(--text-dim)">← Sebelumnya</span>
   @else
-    <span></span>
+    <a href="{{ $transactions->previousPageUrl() }}" style="color:var(--teal);text-decoration:none;font-weight:600;">← Sebelumnya</a>
   @endif
-  @if($transactions->nextPageUrl())
+  <span style="color:var(--text-muted)">Halaman {{ $transactions->currentPage() }} dari {{ $transactions->lastPage() }}</span>
+  @if($transactions->hasMorePages())
     <a href="{{ $transactions->nextPageUrl() }}" style="color:var(--teal);text-decoration:none;font-weight:600;">Selanjutnya →</a>
+  @else
+    <span style="color:var(--text-dim)">Selanjutnya →</span>
   @endif
 </div>
+@endif
 
 @endsection
 

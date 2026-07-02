@@ -55,7 +55,7 @@ class TransactionController extends Controller
         $transactions = Transaction::where('user_id', $userId)
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->simplePaginate(10);
+            ->paginate(10);
 
         return view('pages.transactions.index', compact(
             'totalIncome', 'totalExpense', 'totalBalance',
