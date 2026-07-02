@@ -66,6 +66,9 @@
     <div class="page-title">💰 Keuangan</div>
     <div class="page-sub">Lacak setiap rupiah</div>
   </div>
+  <a href="{{ route('reports.index') }}" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-main);border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:6px;">
+    📋 Laporan & Export PDF
+  </a>
 </div>
 
 @if(session('success'))
