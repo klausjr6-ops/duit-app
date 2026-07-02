@@ -280,7 +280,14 @@
       </form>
     </div>
     @endforeach
-    <div style="margin-top:14px">{{ $transactions->links() }}</div>
+    <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:13px;">
+  @if($transactions->previousPageUrl())
+    <a href="{{ $transactions->previousPageUrl() }}" style="color:var(--teal);text-decoration:none;font-weight:600;">← Sebelumnya</a>
+  @else
+    <span></span>
+  @endif
+  @if($transactions->nextPageUrl())
+    <a href="{{ $transactions->nextPageUrl() }}" style="color:var(--teal);text-decoration:none;font-weight:600;">Selanjutnya →</a>
   @endif
 </div>
 
