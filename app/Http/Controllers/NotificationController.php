@@ -26,16 +26,26 @@ class NotificationController extends Controller
         // 1. JADWAL YANG MENDEKATI WAKTU (30 menit ke depan)
         // ============================================
         if (class_exists(Schedule::class)) {
+            $now = now();
+            $windowEnd = now()->addMinutes(30);
+
             $upcoming = Schedule::where('user_id', $user->id)
-                ->whereBetween('scheduled_at', [now(), now()->addMinutes(30)])
                 ->where('notified', false)
-                ->get();
+                ->get()
+                ->filter(function ($s) use ($now, $windowEnd) {
+                    if (!$s->date) {
+                        return false;
+                    }
+                    $scheduledAt = Carbon::parse($s->date->format('Y-m-d') . ' ' . ($s->time ?? '00:00:00'));
+                    return $scheduledAt->between($now, $windowEnd);
+                });
 
             foreach ($upcoming as $s) {
+                $scheduledAt = Carbon::parse($s->date->format('Y-m-d') . ' ' . ($s->time ?? '00:00:00'));
                 $alerts[] = [
                     'id'    => 'schedule-' . $s->id,
                     'title' => 'Jadwal sebentar lagi',
-                    'body'  => "{$s->title} — " . Carbon::parse($s->scheduled_at)->diffForHumans(),
+                    'body'  => "{$s->title} — " . $scheduledAt->diffForHumans(),
                     'icon'  => '📅',
                 ];
                 $s->update(['notified' => true]);
