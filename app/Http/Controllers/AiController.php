@@ -109,14 +109,13 @@ class AiController extends Controller
             ->whereMonth('created_at', $lastMonth->month)->whereYear('created_at', $lastMonth->year)->sum('amount');
 
         $recent = Transaction::where('user_id', $user->id)
-            ->with('category')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
             ->map(fn($t) => [
                 'tipe'       => $t->type === 'masuk' ? 'Pemasukan' : 'Pengeluaran',
                 'jumlah'     => 'Rp ' . number_format($t->amount, 0, ',', '.'),
-                'kategori'   => $t->category->name ?? '-',
+                'kategori'   => $t->category ?? '-',
                 'keterangan' => $t->description ?? '-',
                 'tanggal'    => Carbon::parse($t->created_at)->translatedFormat('d M Y'),
             ]);
@@ -125,9 +124,8 @@ class AiController extends Controller
             ->where('type', 'keluar')
             ->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
-            ->with('category')
             ->get()
-            ->groupBy(fn($t) => $t->category->name ?? 'Lainnya')
+            ->groupBy(fn($t) => $t->category ?? 'Lainnya')
             ->map(fn($g) => $g->sum('amount'))
             ->sortDesc()
             ->take(3)
