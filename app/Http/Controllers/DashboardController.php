@@ -41,10 +41,13 @@ class DashboardController extends Controller
             ->whereBetween('date', [$startOfMonth, $today])
             ->sum('amount');
 
-        // ── Total Balance ──────────────────────────────────
-        $allIncome  = Transaction::where('user_id', $userId)->where('type', 'income')->sum('amount');
-        $allExpense = Transaction::where('user_id', $userId)->where('type', 'expense')->sum('amount');
-        $totalBalance = $allIncome - $allExpense;
+        // ── Total Balance (Saldo Bersih) ────────────────────
+        // Karena setiap awal bulan sudah otomatis dibuatkan entry
+        // "Saldo Terakhir Bulan Lalu" (carry-over), saldo bersih saat ini
+        // cukup dihitung dari transaksi bulan berjalan saja — TIDAK dari
+        // seluruh histori (all-time), supaya saldo bulan lalu tidak
+        // terhitung dobel setiap bulan.
+        $totalBalance = $monthlyIncome - $monthlyExpense;
 
         // ── Goals / Savings ────────────────────────────────
         $totalSavings = 0;
