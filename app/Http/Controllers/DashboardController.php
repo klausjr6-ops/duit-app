@@ -16,6 +16,9 @@ class DashboardController extends Controller
         $today  = Carbon::today();
         $startOfMonth = Carbon::now()->startOfMonth();
 
+        // ── Carry Over Saldo Bulan Lalu ────────────────────
+        $this->carryOverPreviousMonthBalance($userId, $startOfMonth);
+
         // ── Today ──────────────────────────────────────────
         $todayIncome = Transaction::where('user_id', $userId)
             ->where('type', 'income')
@@ -131,6 +134,58 @@ class DashboardController extends Controller
         }
 
         return response()->json(['reply' => $reply]);
+    }
+
+    /**
+     * Buat otomatis 1 transaksi pemasukan berisi saldo akhir bulan lalu,
+     * dengan keterangan "Saldo Terakhir Bulan Lalu", kalau bulan ini
+     * belum pernah dibuatkan entry tersebut.
+     */
+    private function carryOverPreviousMonthBalance(int $userId, Carbon $startOfMonth): void
+    {
+        $label = 'Saldo Terakhir Bulan Lalu';
+
+        // Cek apakah bulan ini sudah pernah dibuatkan carry-over
+        $alreadyExists = Transaction::where('user_id', $userId)
+            ->where('description', $label)
+            ->whereDate('date', '>=', $startOfMonth)
+            ->exists();
+
+        if ($alreadyExists) {
+            return;
+        }
+
+        // Jangan buat carry-over kalau belum ada transaksi sama sekali
+        // sebelum bulan ini (user baru / belum ada histori)
+        $hasHistoryBeforeThisMonth = Transaction::where('user_id', $userId)
+            ->whereDate('date', '<', $startOfMonth)
+            ->exists();
+
+        if (!$hasHistoryBeforeThisMonth) {
+            return;
+        }
+
+        // Hitung saldo berjalan sampai akhir bulan lalu (semua transaksi
+        // sebelum tanggal 1 bulan ini)
+        $incomeBefore = Transaction::where('user_id', $userId)
+            ->where('type', 'income')
+            ->whereDate('date', '<', $startOfMonth)
+            ->sum('amount');
+
+        $expenseBefore = Transaction::where('user_id', $userId)
+            ->where('type', 'expense')
+            ->whereDate('date', '<', $startOfMonth)
+            ->sum('amount');
+
+        $previousBalance = $incomeBefore - $expenseBefore;
+
+        Transaction::create([
+            'user_id'     => $userId,
+            'type'        => 'income',
+            'amount'      => $previousBalance,
+            'description' => $label,
+            'date'        => $startOfMonth->toDateString(),
+        ]);
     }
 
     private function calculateHealthScore($balance, $monthlyIncome, $monthlyExpense): int
