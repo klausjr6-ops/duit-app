@@ -65,6 +65,7 @@ body{display:block;}
     <a class="sidebar-icon {{ request()->routeIs('transactions*') ? 'active' : '' }}" href="{{ route('transactions.index') }}" title="Keuangan">💰</a>
     <a class="sidebar-icon {{ request()->routeIs('schedules*') ? 'active' : '' }}" href="{{ route('schedules.index') }}" title="Jadwal">📅</a>
     <a class="sidebar-icon {{ request()->routeIs('goals*') ? 'active' : '' }}" href="{{ route('goals.index') }}" title="Goals">🎯</a>
+    <a class="sidebar-icon {{ request()->routeIs('reports*') ? 'active' : '' }}" href="{{ route('reports.index') }}" title="Laporan">📋</a>
     <a class="sidebar-avatar {{ request()->routeIs('profile.edit') ? 'active' : '' }}" href="{{ route('profile.edit') }}" title="Profil">
         @if(auth()->user()->avatar ?? false)
             <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar">
